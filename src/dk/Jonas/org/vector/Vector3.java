@@ -1,6 +1,7 @@
 package dk.Jonas.org.vector;
 
 public class Vector3 {
+	public static final Vector3 zero = new Vector3(0, 0, 0);
 	public double x, y, z;
 	
 	public Vector3(double x, double y, double z) {
@@ -47,7 +48,13 @@ public class Vector3 {
 		return v;
 	}
 	
-	public Vector3 mul(Matrix4x4 m) {
+	public void mulEqual(double k) {
+		x *= k;
+		y *= k;
+		z *= k;
+	}
+	
+	public Vector3 mulEqual(Matrix4x4 m) {
 		double x = this.x*m.m00 + this.y*m.m10 + this.z*m.m20 + m.m30;
 		double y = this.x*m.m01 + this.y*m.m11 + this.z*m.m21 + m.m31;
 		double z = this.x*m.m02 + this.y*m.m12 + this.z*m.m22 + m.m32;

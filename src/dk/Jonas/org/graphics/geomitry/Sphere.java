@@ -6,11 +6,11 @@ import dk.Jonas.org.vector.Vector3;
 public class Sphere extends Geometry {
 	public double radius = 2;
 	
-	private int color;
+	private Vector3 color;
 	
 	public double n = 0.5;
 	
-	public Sphere(Vector3 pos, double radius, int color) {
+	public Sphere(Vector3 pos, double radius, Vector3 color) {
 		super(pos);
 		this.radius = radius;
 		this.color = color;
@@ -37,6 +37,6 @@ public class Sphere extends Geometry {
 			t1 = tmp;
 		}
 		
-		return new Hit(t0, color, ray.dir);
+		return new Hit(t0, color, ray, pos);
 	}
 }

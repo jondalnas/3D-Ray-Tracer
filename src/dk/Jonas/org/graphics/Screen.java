@@ -10,18 +10,23 @@ import dk.Jonas.org.graphics.ray.Ray;
 import dk.Jonas.org.vector.Vector3;
 
 public class Screen extends Bitmap {
+	public static final double MIN_BRIGHTNESS = 0.8;
+
 	Camera cam;
 	
 	List<Geometry> geometries = new ArrayList<Geometry>();
+	List<Light> light = new ArrayList<Light>();
 	
 	public Screen(int width, int height) {
 		super(width, height);
 		
 		cam = new Camera(width, height, 90);
 
-		geometries.add(new Sphere(new Vector3(0, 0, 5), 2, 0xff0000));
-		geometries.add(new Sphere(new Vector3(5, 0, 5), 2, 0x00ff00));
-		geometries.add(new Sphere(new Vector3(-5, 1, 8), 3, 0x0000ff));
+		geometries.add(new Sphere(new Vector3(0, 0, 5), 2, new Vector3(1, 0, 0)));
+		geometries.add(new Sphere(new Vector3(5, 0, 5), 2, new Vector3(0, 1, 0)));
+		geometries.add(new Sphere(new Vector3(-5, 1, 8), 3, new Vector3(0, 0, 1)));
+		
+		light.add(new Light(new Vector3(1, 0, 0)));
 	}
 	
 	public double step = 0.1;
@@ -40,7 +45,9 @@ public class Screen extends Bitmap {
 			for (int x = 0; x < width; x++) {
 				Ray r = cam.generateRay(x, y);
 				
-				pixels[x+y*width] = r.rayColor(geometries);
+				Vector3 color = r.rayColor(geometries, light);
+				
+				pixels[x+y*width] = (int) (color.x * 0xff) << 16 | (int) (color.y * 0xff) << 8 | (int) (color.z * 0xff);
 			}
 		}
 	}
