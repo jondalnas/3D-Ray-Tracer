@@ -102,4 +102,8 @@ public class Vector3 {
 	public String toString() {
 		return "(" + x + ", " + y + ", " + z + ")";
 	}
+
+	public Vector3 negative() {
+		return new Vector3(-x, -y, -z);
+	}
 }

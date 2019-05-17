@@ -43,29 +43,45 @@ public class Ray {
 	public Vector3 rayColor(List<Geometry> geometries, List<Light> lights) {
 		closest = intersects(geometries);
 		
-		if (closest == null) return Vector3.zero;
+		if (closest == null) return Screen.SKY_COLOR;
 		
 		color = closest.getColor();
 		
-		double brightness = 0;
-		
-		for (Light l : lights) {
-			Vector3 toLight = l.pos.sub(closest.getPos());
-			double distanceToLight = toLight.length();
-			toLight.mulEqual(1/distanceToLight);
+		if (color != null) {
+			double brightness = 0;
 			
-			Ray toLightRay = new Ray(closest.getPos().add(toLight), toLight);
-			
-			double currBrightness;
-			
-			Hit closestToLight;
-			if ((closestToLight = toLightRay.intersects(geometries)) == null || closestToLight.getDistance() > distanceToLight) {
-				currBrightness = closest.getNormal().dot(toLight);
+			for (Light l : lights) {
+				Hit currClosest = closest;
 				
-				if (currBrightness > brightness) brightness = currBrightness;
+				for (int i = 0; i < 3; i++) {
+					Vector3 toLight = l.pos.sub(currClosest.getPos());
+					double distanceToLight = toLight.length();
+					toLight.mulEqual(1/distanceToLight);
+					
+					Ray toLightRay = new Ray(currClosest.getPos().add(toLight), toLight);
+					
+					Hit closestToLight;
+					if ((closestToLight = toLightRay.intersects(geometries)) == null || closestToLight.getDistance() > distanceToLight) {
+						double currBrightness = currClosest.getNormal().dot(toLight);
+						
+						if (currBrightness > brightness) brightness = currBrightness;
+					} else if (closestToLight.getColor() == null) {
+						currClosest = closestToLight;
+						
+						continue;
+					}
+					
+					break;
+				}
 			}
+			
+			return color.mul(1 - (1 - brightness) * Screen.MIN_BRIGHTNESS);
+		} else {
+			Vector3 reflectDir = dir.sub(closest.getNormal().mul(2*(dir.dot(closest.getNormal()))));
+			
+			Ray reflection = new Ray(closest.getPos(), reflectDir);
+			
+			return reflection.rayColor(geometries, lights).mul(0.9).add(Vector3.zero);
 		}
-		
-		return color.mul(1 - (1 - brightness) * Screen.MIN_BRIGHTNESS);
 	}
 }

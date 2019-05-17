@@ -10,17 +10,17 @@ public class Hit {
 	private Vector3 center;
 	private Vector3 normal;
 	
-	public Hit(double t0, Vector3 color, Ray ray, Vector3 center) {
-		this.distance = t0;
+	public Hit(double t, Vector3 color, Ray ray, Vector3 center) {
+		this.distance = t;
 		this.color = color;
-		this.pos = ray.dir.mul(t0).add(ray.pos);
+		this.pos = ray.dir.mul(t).add(ray.pos);
 		this.normal = pos.sub(center).normalized();
 	}
 	
-	public Hit(double t0, Vector3 color, Ray ray, Vector3 center, Vector3 normal) {
-		this.distance = t0;
+	public Hit(double t, Vector3 color, Ray ray, Vector3 center, Vector3 normal) {
+		this.distance = t;
 		this.color = color;
-		this.pos = ray.dir.mul(t0).add(ray.pos);
+		this.pos = ray.dir.mul(t).add(ray.pos);
 		this.center = center;
 		this.normal = normal;
 	}

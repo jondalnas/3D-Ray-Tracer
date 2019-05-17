@@ -16,8 +16,8 @@ import dk.Jonas.org.graphics.Screen;
 public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
-	public static final int WIDTH = 640;//640;
-	public static final int HEIGHT = 640;//480;
+	public static final int WIDTH = 1920;//640;
+	public static final int HEIGHT = 1080;//480;
 	public static final int SCALE = 1; //4
 
 	private boolean running;
@@ -66,48 +66,18 @@ public class Main extends Canvas implements Runnable {
 
 	public void run() {
 		int frames = 0;
-
-		double unprocessedSeconds = 0;
-		long lastTime = System.nanoTime();
-		double secondsPerTick = 1 / 60.0;
-		int tickCount = 0;
-
-		requestFocus();
-
-		while (running) {
-			long now = System.nanoTime();
-			long passedTime = now - lastTime;
-			lastTime = now;
-			if (passedTime < 0) passedTime = 0;
-			if (passedTime > 100000000) passedTime = 100000000;
-
-			unprocessedSeconds += passedTime / 1000000000.0;
-
-			boolean ticked = false;
-			while (unprocessedSeconds > secondsPerTick) {
-				tick();
-				unprocessedSeconds -= secondsPerTick;
-				ticked = true;
-
-				tickCount++;
-				if (tickCount % 60 == 0) {
-					System.out.println(frames + " fps");
-					lastTime += 1000;
-					frames = 0;
-				}
+		long lastNano = System.nanoTime();
+		
+		while (true) {
+			tick();
+			render();
+			
+			frames++;
+			if (frames == 10) {
+				System.out.println((frames / (double) ((System.nanoTime() - lastNano) / 1000000000L)) + " FPS");
+				frames = 0;
+				lastNano = System.nanoTime();
 			}
-
-			if (ticked) {
-				render();
-				frames++;
-			} else {
-				try {
-					Thread.sleep(0);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-
 		}
 	}
 

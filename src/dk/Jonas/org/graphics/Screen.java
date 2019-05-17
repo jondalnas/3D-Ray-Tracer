@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dk.Jonas.org.InputHandler;
+import dk.Jonas.org.Main;
 import dk.Jonas.org.graphics.geomitry.Geometry;
+import dk.Jonas.org.graphics.geomitry.Plane;
 import dk.Jonas.org.graphics.geomitry.Sphere;
 import dk.Jonas.org.graphics.ray.Ray;
 import dk.Jonas.org.vector.Vector3;
 
 public class Screen extends Bitmap {
 	public static final double MIN_BRIGHTNESS = 0.8;
+
+	public static final Vector3 SKY_COLOR = new Vector3(0.121568627, 0.564705882, 1);
 
 	Camera cam;
 	
@@ -22,9 +26,10 @@ public class Screen extends Bitmap {
 		
 		cam = new Camera(width, height, 90);
 
-		geometries.add(new Sphere(new Vector3(0, 0, 5), 2, new Vector3(1, 0, 0)));
-		geometries.add(new Sphere(new Vector3(5, 0, 5), 2, new Vector3(0, 1, 0)));
+		geometries.add(new Sphere(new Vector3(0, -1, 5), 2, null));//new Vector3(1, 0, 0)));
+		geometries.add(new Sphere(new Vector3(5, 0, 5), 2, null));//new Vector3(0, 1, 0)));
 		geometries.add(new Sphere(new Vector3(-5, 1, 8), 3, new Vector3(0, 0, 1)));
+		geometries.add(new Plane(new Vector3(0, -3, 0), new Vector3(0, 1, 0), new Vector3(1, 0, 0)));
 		
 		light.add(new Light(new Vector3(1, 0, 0)));
 	}
@@ -40,7 +45,10 @@ public class Screen extends Bitmap {
 		fill(0, 0, width, height, 0xffffff);
 		
 		cam.updateRotation();
-
+		
+		//light.get(0).pos = new Vector3(Math.sin(Main.ticks/90.0)*7, 0, Math.cos(Main.ticks/90.0)*7+5);
+		//geometries.get(0).pos = new Vector3(geometries.get(0).pos.x, geometries.get(0).pos.y, Math.sin(Main.ticks/90.0)*2.0+5);
+		
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				Ray r = cam.generateRay(x, y);
