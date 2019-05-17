@@ -26,6 +26,16 @@ public class Vector3 {
 		
 		return vr;
 	}
+
+	public Vector3 sub(Vector3 v) {
+		Vector3 vr = new Vector3(x, y, z);
+		
+		vr.x -= v.x;
+		vr.y -= v.y;
+		vr.z -= v.z;
+		
+		return vr;
+	}
 	
 	public Vector3 mul(double k) {
 		Vector3 v = new Vector3(x, y, z);
@@ -51,6 +61,10 @@ public class Vector3 {
 		
 		return new Vector3(x, y, z);
 	}
+
+	public double dot(Vector3 v) {
+		return x*v.x+y*v.y+z*v.z;
+	}
 	
 	public double length() {
 		return Math.sqrt(x*x+y*y+z*z);
@@ -62,6 +76,20 @@ public class Vector3 {
 		x /= d;
 		y /= d;
 		z /= d;
+	}
+
+	public Vector3 normalized() {
+		Vector3 v = new Vector3(x, y, z);
+		
+		double d = v.length();
+		
+		if (d == 1) return v;
+		
+		v.x /= d;
+		v.y /= d;
+		v.z /= d;
+		
+		return v;
 	}
 	
 	public String toString() {

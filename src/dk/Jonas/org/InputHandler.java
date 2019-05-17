@@ -5,8 +5,8 @@ import java.awt.event.*;
 import dk.Jonas.org.graphics.Screen;
 
 public class InputHandler implements KeyListener, FocusListener, MouseMotionListener {
-	public boolean[] keys = new boolean[65536];
-	public char charDown;
+	public static boolean[] keys = new boolean[65536];
+	public static char charDown;
 	
 	public void focusGained(FocusEvent arg0) {
 	}

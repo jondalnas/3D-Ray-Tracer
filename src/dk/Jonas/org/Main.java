@@ -17,7 +17,7 @@ public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
 	public static final int WIDTH = 640;//640;
-	public static final int HEIGHT = 480;//480;
+	public static final int HEIGHT = 640;//480;
 	public static final int SCALE = 1; //4
 
 	private boolean running;
@@ -27,6 +27,8 @@ public class Main extends Canvas implements Runnable {
 	private BufferedImage img;
 	private int[] pixels;
 	private InputHandler input;
+	
+	public static int ticks;
 
 	public Main() {
 		Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
@@ -110,6 +112,7 @@ public class Main extends Canvas implements Runnable {
 	}
 
 	private void tick() {
+		ticks++;
 	}
 
 	private void render() {

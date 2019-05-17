@@ -8,9 +8,10 @@ public class Camera {
 	private int width, height;
 	private double fov = 90;
 	private double aspectRatio;
-	private Vector3 rot = new Vector3(0, 0, 0);
-	private Vector3 pos = new Vector3(0, 0, 0);;
 	private Matrix4x4 rotationMatrix;
+
+	public Vector3 rot = new Vector3(0, 0, 0);
+	public Vector3 pos = new Vector3(0, 0, 0);
 	
 	public Camera(int width, int height, double fov) {
 		this.width = width;
@@ -28,9 +29,7 @@ public class Camera {
 		double rotY = fov * (wp-0.5);
 		double rotX = hFov * (hp-0.5);
 		
-		Vector3 rayDir = new Vector3(0, 0, 1);
-		
-		rayDir = rayDir.mul(new Matrix4x4(1).rotateMatrix(rotX, rotY, 0).mul(rotationMatrix));
+		Vector3 rayDir = new Vector3(0, 0, 1).mul(rotationMatrix.mul(new Matrix4x4(1).rotateMatrix(rotX, rotY, 0)));
 		
 		rayDir.normalize();
 		
