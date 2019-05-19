@@ -1,7 +1,7 @@
 package dk.Jonas.org.vector;
 
 public class Vector3 {
-	public static final Vector3 zero = new Vector3(0, 0, 0);
+	public static final Vector3 ZERO = new Vector3(0, 0, 0);
 	public double x, y, z;
 	
 	public Vector3(double x, double y, double z) {
@@ -98,12 +98,24 @@ public class Vector3 {
 		
 		return v;
 	}
-	
-	public String toString() {
-		return "(" + x + ", " + y + ", " + z + ")";
-	}
 
 	public Vector3 negative() {
 		return new Vector3(-x, -y, -z);
+	}
+	
+	public Vector2 xy() {
+		return new Vector2(x, y);
+	}
+	
+	public Vector2 xz() {
+		return new Vector2(x, z);
+	}
+	
+	public Vector2 yz() {
+		return new Vector2(y, z);
+	}
+	
+	public String toString() {
+		return "(" + x + ", " + y + ", " + z + ")";
 	}
 }

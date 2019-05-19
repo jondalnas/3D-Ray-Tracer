@@ -16,8 +16,8 @@ import dk.Jonas.org.graphics.Screen;
 public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
-	public static final int WIDTH = 1920;//640;
-	public static final int HEIGHT = 1080;//480;
+	public static final int WIDTH = 640;//640;
+	public static final int HEIGHT = 480;//480;
 	public static final int SCALE = 1; //4
 
 	private boolean running;
@@ -65,19 +65,15 @@ public class Main extends Canvas implements Runnable {
 	}
 
 	public void run() {
-		int frames = 0;
 		long lastNano = System.nanoTime();
 		
 		while (true) {
 			tick();
 			render();
 			
-			frames++;
-			if (frames == 10) {
-				System.out.println((frames / (double) ((System.nanoTime() - lastNano) / 1000000000L)) + " FPS");
-				frames = 0;
-				lastNano = System.nanoTime();
-			}
+
+			System.out.println((1 / ((System.nanoTime() - lastNano) / 1000000000.0)) + " FPS");
+			lastNano = System.nanoTime();
 		}
 	}
 

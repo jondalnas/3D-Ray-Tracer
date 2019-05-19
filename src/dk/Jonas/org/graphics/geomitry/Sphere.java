@@ -1,6 +1,7 @@
 package dk.Jonas.org.graphics.geomitry;
 
 import dk.Jonas.org.graphics.ray.Ray;
+import dk.Jonas.org.vector.Vector2;
 import dk.Jonas.org.vector.Vector3;
 
 public class Sphere extends Geometry {
@@ -8,7 +9,7 @@ public class Sphere extends Geometry {
 	
 	private Vector3 color;
 	
-	public double n = 0.5;
+	public double n = 1.33;
 	
 	public Sphere(Vector3 pos, double radius, Vector3 color) {
 		super(pos);
@@ -37,6 +38,19 @@ public class Sphere extends Geometry {
 			t1 = tmp;
 		}
 		
-		return new Hit(t0, color, ray, pos);
+		if (t0 <= 0.0000000001) t0 = t1;
+		
+		Vector3 currColor = color;
+		
+		/*if (currColor != null) {
+			Vector3 t0Pos = ray.dir.mul(t0).add(ray.pos);
+
+			Vector2 xy = t0Pos.xy();
+			Vector2 xz = t0Pos.xz();
+			
+			if (Math.abs(xy.dot(new Vector2(0, 1))) % 0.25 < 0.05 || Math.abs(xz.dot(new Vector2(0, 1))) % 0.25 < 0.05) currColor = Vector3.ZERO;
+		}*/
+		
+		return new Hit(t0, currColor, ray, pos, n);
 	}
 }

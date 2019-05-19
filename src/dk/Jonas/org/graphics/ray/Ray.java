@@ -11,14 +11,21 @@ import dk.Jonas.org.vector.Vector3;
 public class Ray {
 	public Vector3 pos;
 	public Vector3 dir;
-	
 	public Vector3 color;
 	
+	public int ittr;
+	
 	private Hit closest;
+	private double currRefractIndex = 1.0;
 	
 	public Ray(Vector3 pos, Vector3 dir) {
 		this.pos = pos;
 		this.dir = dir;
+	}
+	
+	public Ray(Vector3 pos, Vector3 dir, double currRefractIndex) {
+		this(pos, dir);
+		this.currRefractIndex = currRefractIndex;
 	}
 	
 	public Hit intersects(List<Geometry> geometries) {
@@ -51,37 +58,64 @@ public class Ray {
 			double brightness = 0;
 			
 			for (Light l : lights) {
-				Hit currClosest = closest;
+				Vector3 toLight = l.pos.sub(closest.getPos());
+				double distanceToLight = toLight.length();
+				toLight.mulEqual(1/distanceToLight);
 				
-				for (int i = 0; i < 3; i++) {
-					Vector3 toLight = l.pos.sub(currClosest.getPos());
-					double distanceToLight = toLight.length();
-					toLight.mulEqual(1/distanceToLight);
+				Ray toLightRay = new Ray(closest.getPos().add(toLight), toLight);
+				
+				Hit closestToLight;
+				if ((closestToLight = toLightRay.intersects(geometries)) == null || closestToLight.getDistance() > distanceToLight) {
+					double currBrightness = closest.getNormal().dot(toLight);
 					
-					Ray toLightRay = new Ray(currClosest.getPos().add(toLight), toLight);
-					
-					Hit closestToLight;
-					if ((closestToLight = toLightRay.intersects(geometries)) == null || closestToLight.getDistance() > distanceToLight) {
-						double currBrightness = currClosest.getNormal().dot(toLight);
-						
-						if (currBrightness > brightness) brightness = currBrightness;
-					} else if (closestToLight.getColor() == null) {
-						currClosest = closestToLight;
-						
-						continue;
-					}
-					
-					break;
+					if (currBrightness > brightness) brightness = currBrightness;
 				}
 			}
 			
 			return color.mul(1 - (1 - brightness) * Screen.MIN_BRIGHTNESS);
 		} else {
+			if (ittr >= Screen.MAX_NUM_OF_ITTERATIONS) return Vector3.ZERO;
+			
 			Vector3 reflectDir = dir.sub(closest.getNormal().mul(2*(dir.dot(closest.getNormal()))));
-			
 			Ray reflection = new Ray(closest.getPos(), reflectDir);
+			reflection.ittr = ittr + 1;
+			Vector3 reflectColor = reflection.rayColor(geometries, lights);
 			
-			return reflection.rayColor(geometries, lights).mul(0.9).add(Vector3.zero);
+			double cosIn = closest.getNormal().dot(dir);
+			Vector3 normal = closest.getNormal();
+			double nIn = currRefractIndex, nTarget = closest.getRefractionIndex();
+			if (cosIn < 0) {
+				cosIn = -cosIn;
+			} else {
+				//TODO: Check what the refraction index of the medium entering is, instead of 1
+				nIn = nTarget;
+				nTarget = 1;
+				normal = normal.negative();
+			}
+			double n = nIn / nTarget;
+			double k = 1 - n * n * (1 - cosIn * cosIn);
+			Vector3 refractColor = Vector3.ZERO;
+			if (k >= 0) {
+				Vector3 refractDir = dir.mul(n).add(normal.mul(n * cosIn - Math.sqrt(k)));
+				
+				Ray refraction = new Ray(closest.getPos(), refractDir, closest.getRefractionIndex());
+				refraction.ittr = ittr + 1;
+				
+				refractColor = refraction.rayColor(geometries, lights);
+			}
+			
+			cosIn = closest.getNormal().dot(dir);
+			double sinTarget = n * Math.sqrt(Math.max(0, 1 - cosIn * cosIn));
+			double fr = 1;
+			if (sinTarget < 1) {
+				double cosTarget = Math.sqrt(Math.max(0, 1 - sinTarget * sinTarget));
+				cosIn = Math.abs(cosIn);
+				double parral = ((nTarget * cosIn) - (nIn * cosTarget)) / ((nTarget * cosIn) + (nIn * cosTarget));
+				double perpen = ((nIn * cosIn) - (nTarget * cosTarget)) / ((nIn * cosIn) + (nTarget * cosTarget));
+				fr = (parral * parral + perpen * perpen) / 2;
+			}
+			
+			return reflectColor.mul(fr).add(refractColor.mul(1 - fr));
 		}
 	}
 }

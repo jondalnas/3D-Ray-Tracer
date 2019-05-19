@@ -16,6 +16,8 @@ public class Screen extends Bitmap {
 
 	public static final Vector3 SKY_COLOR = new Vector3(0.121568627, 0.564705882, 1);
 
+	public static final int MAX_NUM_OF_ITTERATIONS = 10;
+
 	Camera cam;
 	
 	List<Geometry> geometries = new ArrayList<Geometry>();
@@ -25,10 +27,13 @@ public class Screen extends Bitmap {
 		super(width, height);
 		
 		cam = new Camera(width, height, 90);
+		
+		cam.pos = new Vector3(-3, 3, 0);
+		cam.rot = new Vector3(20, 30, -10);
 
-		geometries.add(new Sphere(new Vector3(0, -1, 5), 2, null));//new Vector3(1, 0, 0)));
-		geometries.add(new Sphere(new Vector3(5, 0, 5), 2, null));//new Vector3(0, 1, 0)));
-		geometries.add(new Sphere(new Vector3(-5, 1, 8), 3, new Vector3(0, 0, 1)));
+		geometries.add(new Sphere(new Vector3(0, 1, 3), 2, null));//new Vector3(1, 0, 0)));
+		geometries.add(new Sphere(new Vector3(5, 0, 5), 2, new Vector3(0, 1, 0)));
+		geometries.add(new Sphere(new Vector3(-1, 1, 12), 3, new Vector3(0, 0, 1)));
 		geometries.add(new Plane(new Vector3(0, -3, 0), new Vector3(0, 1, 0), new Vector3(1, 0, 0)));
 		
 		light.add(new Light(new Vector3(1, 0, 0)));
@@ -47,7 +52,7 @@ public class Screen extends Bitmap {
 		cam.updateRotation();
 		
 		//light.get(0).pos = new Vector3(Math.sin(Main.ticks/90.0)*7, 0, Math.cos(Main.ticks/90.0)*7+5);
-		//geometries.get(0).pos = new Vector3(geometries.get(0).pos.x, geometries.get(0).pos.y, Math.sin(Main.ticks/90.0)*2.0+5);
+		//geometries.get(0).pos = new Vector3(geometries.get(0).pos.x, Math.sin(Main.ticks/90.0)*2.0, geometries.get(0).pos.z);
 		
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

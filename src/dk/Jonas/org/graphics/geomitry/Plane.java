@@ -25,7 +25,13 @@ public class Plane extends Geometry {
 			
 			if (t < 0) return null;
 			
-			return new Hit(t, color, ray, ray.dir.mul(t).add(ray.pos), normal);
+			Vector3 currColor = color;
+			
+			/*if (ray.dir.mul(t).add(ray.pos).length() % 1.0 < 0.1) {
+				currColor = Vector3.ZERO;
+			}*/
+			
+			return new Hit(t, currColor, ray, ray.dir.mul(t).add(ray.pos), normal);
 		}
 		
 		return null;
