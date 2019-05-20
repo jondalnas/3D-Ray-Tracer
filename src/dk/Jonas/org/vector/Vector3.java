@@ -115,6 +115,10 @@ public class Vector3 {
 		return new Vector2(y, z);
 	}
 	
+	public Vector3 clone() {
+		return new Vector3(x, y, z);
+	}
+	
 	public String toString() {
 		return "(" + x + ", " + y + ", " + z + ")";
 	}

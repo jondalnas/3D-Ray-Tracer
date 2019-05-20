@@ -71,6 +71,48 @@ public class Matrix4x4 {
 		return mat;
 	}
 	
+	public void mulEqual(Matrix4x4 m) {
+		double nm00 = m00*m.m00 + m10*m.m01 + m20*m.m02 + m30*m.m03;
+		double nm10 = m00*m.m10+m10*m.m11+m20*m.m12+m30*m.m13;
+		double nm20 = m00*m.m20+m10*m.m21+m20*m.m22+m30*m.m23;
+		double nm30 = m00*m.m30+m10*m.m31+m20*m.m32+m30*m.m33;
+		
+		double nm01 = m01*m.m00+m11*m.m01+m21*m.m02+m31*m.m03;
+		double nm11 = m01*m.m10+m11*m.m11+m21*m.m12+m31*m.m13;
+		double nm21 = m01*m.m20+m11*m.m21+m21*m.m22+m31*m.m23;
+		double nm31 = m01*m.m30+m11*m.m31+m21*m.m32+m31*m.m33;
+		
+		double nm02 = m02*m.m00+m12*m.m01+m22*m.m02+m32*m.m03;
+		double nm12 = m02*m.m10+m12*m.m11+m22*m.m12+m32*m.m13;
+		double nm22 = m02*m.m20+m12*m.m21+m22*m.m22+m32*m.m23;
+		double nm32 = m02*m.m30+m12*m.m31+m22*m.m32+m32*m.m33;
+		
+		double nm03 = m03*m.m00+m13*m.m01+m23*m.m02+m33*m.m03;
+		double nm13 = m03*m.m10+m13*m.m11+m23*m.m12+m33*m.m13;
+		double nm23 = m03*m.m20+m13*m.m21+m23*m.m22+m33*m.m23;
+		double nm33 = m03*m.m30+m13*m.m31+m23*m.m32+m33*m.m33;
+
+		m00 = nm00;
+		m10 = nm10;
+		m20 = nm20;
+		m30 = nm30;
+
+		m01 = nm01;
+		m11 = nm11;
+		m21 = nm21;
+		m31 = nm31;
+
+		m02 = nm02;
+		m12 = nm12;
+		m22 = nm22;
+		m32 = nm32;
+
+		m03 = nm03;
+		m13 = nm13;
+		m23 = nm23;
+		m33 = nm33;
+	}
+	
 	public Matrix4x4 scaleMatrix(double x, double y, double z) {
 		Matrix4x4 scale = new Matrix4x4(1);
 		
@@ -118,19 +160,18 @@ public class Matrix4x4 {
 									   0, 0,    0,     1);
 																	 
 		Matrix4x4 rotY = new Matrix4x4(cosY,	0, sinY, 0,
-																	 0,		 1, 0,		0,
-																	 -sinY, 0, cosY, 0,
-																	 0,		 0, 0,		1);
+									   0,       1, 0,    0,
+									   -sinY,   0, cosY, 0,
+									   0,       0, 0,    1);
 																	 
 		Matrix4x4 rotZ = new Matrix4x4(cosZ, -sinZ, 0, 0,
-																	 sinZ,	cosZ, 0, 0,
-																	 0,		 0,		1, 0,
-																	 0,		 0,		0, 1);
+									   sinZ, cosZ,  0, 0,
+									   0,    0,	    1, 0,
+									   0,    0,	    0, 1);
 		
-		rotX = rotX.mul(rotY);
-		rotX = rotX.mul(rotZ);
-		
-		setMatrix(mul(rotX));
+		setMatrix(rotY);
+		mulEqual(rotX);
+		mulEqual(rotZ);
 		
 		return this;
 	}

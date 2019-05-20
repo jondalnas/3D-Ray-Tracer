@@ -9,15 +9,12 @@ import javax.imageio.ImageIO;
 import dk.Jonas.org.graphics.Bitmap;
 
 public class Art {
+	public static Bitmap cage = loadImage("/cage.jpg");
+	
 	public int[] pixels;
 	public int width, height;
 	
 	public static Bitmap loadImage(String path) {
-		
-		if (!path.endsWith(".png")) {
-			path = path + ".png";
-		}
-		
 		try {
 			BufferedImage image = ImageIO.read(Art.class.getResource(path));
 	

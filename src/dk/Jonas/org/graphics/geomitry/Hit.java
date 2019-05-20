@@ -10,6 +10,8 @@ public class Hit {
 	private Vector3 center;
 	private Vector3 normal;
 	private double refractionIndex = 1;
+	private double opacity = -1;
+	private int physicsMask;
 	
 	public Hit(double t, Vector3 color, Ray ray, Vector3 center) {
 		this.distance = t;
@@ -19,13 +21,15 @@ public class Hit {
 		this.normal = pos.sub(center).normalized();
 	}
 	
-	public Hit(double t, Vector3 color, Ray ray, Vector3 center, double refractionIndex) {
+	public Hit(double t, Vector3 color, Ray ray, Vector3 center, double refractionIndex, int physicsMask, double opacity) {
 		this(t, color, ray, center);
 		this.refractionIndex = refractionIndex;
+		this.physicsMask = physicsMask;
+		this.opacity = opacity;
 	}
 	
-	public Hit(double t, Vector3 color, Ray ray, Vector3 center, double refractionIndex, Vector3 normal) {
-		this(t, color, ray, center, refractionIndex);
+	public Hit(double t, Vector3 color, Ray ray, Vector3 center, double refractionIndex, int physicsMask, double opacity, Vector3 normal) {
+		this(t, color, ray, center, refractionIndex, physicsMask, opacity);
 		this.normal = normal;
 	}
 	
@@ -56,5 +60,13 @@ public class Hit {
 
 	public double getRefractionIndex() {
 		return refractionIndex;
+	}
+	
+	public double getOpacity() {
+		return opacity;
+	}
+
+	public int getPhysicsMask() {
+		return physicsMask;
 	}
 }

@@ -6,6 +6,7 @@ import dk.Jonas.org.graphics.Light;
 import dk.Jonas.org.graphics.Screen;
 import dk.Jonas.org.graphics.geomitry.Geometry;
 import dk.Jonas.org.graphics.geomitry.Hit;
+import dk.Jonas.org.graphics.geomitry.PhysicsMask;
 import dk.Jonas.org.vector.Vector3;
 
 public class Ray {
@@ -54,7 +55,7 @@ public class Ray {
 		
 		color = closest.getColor();
 		
-		if (color != null) {
+		if (closest.getPhysicsMask() == 0) {
 			double brightness = 0;
 			
 			for (Light l : lights) {
@@ -74,48 +75,61 @@ public class Ray {
 			
 			return color.mul(1 - (1 - brightness) * Screen.MIN_BRIGHTNESS);
 		} else {
-			if (ittr >= Screen.MAX_NUM_OF_ITTERATIONS) return Vector3.ZERO;
+			if (ittr >= Screen.MAX_NUM_OF_ITTERATIONS) return closest.getColor() == null ? Vector3.ZERO : closest.getColor();
 			
-			Vector3 reflectDir = dir.sub(closest.getNormal().mul(2*(dir.dot(closest.getNormal()))));
-			Ray reflection = new Ray(closest.getPos(), reflectDir);
-			reflection.ittr = ittr + 1;
-			Vector3 reflectColor = reflection.rayColor(geometries, lights);
+			double fr = 0;
+			Vector3 currColor = Vector3.ZERO;
 			
-			double cosIn = closest.getNormal().dot(dir);
-			Vector3 normal = closest.getNormal();
-			double nIn = currRefractIndex, nTarget = closest.getRefractionIndex();
-			if (cosIn < 0) {
-				cosIn = -cosIn;
-			} else {
-				//TODO: Check what the refraction index of the medium entering is, instead of 1
-				nIn = nTarget;
-				nTarget = 1;
-				normal = normal.negative();
+			if (PhysicsMask.REFLECT.testMask(closest.getPhysicsMask())) {
+				Vector3 reflectDir = dir.sub(closest.getNormal().mul(2*(dir.dot(closest.getNormal()))));
+				Ray reflection = new Ray(closest.getPos(), reflectDir);
+				reflection.ittr = ittr + 1;
+				currColor = reflection.rayColor(geometries, lights);
 			}
-			double n = nIn / nTarget;
-			double k = 1 - n * n * (1 - cosIn * cosIn);
-			Vector3 refractColor = Vector3.ZERO;
-			if (k >= 0) {
-				Vector3 refractDir = dir.mul(n).add(normal.mul(n * cosIn - Math.sqrt(k)));
+
+			if (PhysicsMask.REFRACT.testMask(closest.getPhysicsMask())) {
+				double cosIn = closest.getNormal().dot(dir);
+				Vector3 normal = closest.getNormal();
+				double nIn = currRefractIndex, nTarget = closest.getRefractionIndex();
+				if (cosIn < 0) {
+					cosIn = -cosIn;
+				} else {
+					//TODO: Check what the refraction index of the medium entering is, instead of 1
+					nIn = nTarget;
+					nTarget = 1;
+					normal = normal.negative();
+				}
+				double n = nIn / nTarget;
+				double k = 1 - n * n * (1 - cosIn * cosIn);
+				Vector3 refractColor = Vector3.ZERO;
+				if (k >= 0) {
+					Vector3 refractDir = dir.mul(n).add(normal.mul(n * cosIn - Math.sqrt(k)));
+					
+					Ray refraction = new Ray(closest.getPos(), refractDir, closest.getRefractionIndex());
+					refraction.ittr = ittr + 1;
+					
+					refractColor = refraction.rayColor(geometries, lights);
+				}
 				
-				Ray refraction = new Ray(closest.getPos(), refractDir, closest.getRefractionIndex());
-				refraction.ittr = ittr + 1;
-				
-				refractColor = refraction.rayColor(geometries, lights);
+				if (PhysicsMask.REFRACT.testMask(closest.getPhysicsMask())) {
+					cosIn = closest.getNormal().dot(dir);
+					double sinTarget = n * Math.sqrt(Math.max(0, 1 - cosIn * cosIn));
+					fr = 1;
+					if (sinTarget < 1) {
+						double cosTarget = Math.sqrt(Math.max(0, 1 - sinTarget * sinTarget));
+						cosIn = Math.abs(cosIn);
+						double parral = ((nTarget * cosIn) - (nIn * cosTarget)) / ((nTarget * cosIn) + (nIn * cosTarget));
+						double perpen = ((nIn * cosIn) - (nTarget * cosTarget)) / ((nIn * cosIn) + (nTarget * cosTarget));
+						fr = (parral * parral + perpen * perpen) / 2;
+					}
+					
+					currColor = currColor.mul(fr).add(refractColor.mul(1 - fr));
+				} else {
+					currColor = refractColor;
+				}
 			}
 			
-			cosIn = closest.getNormal().dot(dir);
-			double sinTarget = n * Math.sqrt(Math.max(0, 1 - cosIn * cosIn));
-			double fr = 1;
-			if (sinTarget < 1) {
-				double cosTarget = Math.sqrt(Math.max(0, 1 - sinTarget * sinTarget));
-				cosIn = Math.abs(cosIn);
-				double parral = ((nTarget * cosIn) - (nIn * cosTarget)) / ((nTarget * cosIn) + (nIn * cosTarget));
-				double perpen = ((nIn * cosIn) - (nTarget * cosTarget)) / ((nIn * cosIn) + (nTarget * cosTarget));
-				fr = (parral * parral + perpen * perpen) / 2;
-			}
-			
-			return reflectColor.mul(fr).add(refractColor.mul(1 - fr));
+			return (closest.getOpacity() == -1) ? currColor : currColor.mul(closest.getOpacity()).add(closest.getColor().mul(1-closest.getOpacity()));
 		}
 	}
 }

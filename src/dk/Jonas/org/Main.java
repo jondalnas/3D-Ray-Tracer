@@ -16,9 +16,9 @@ import dk.Jonas.org.graphics.Screen;
 public class Main extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
-	public static final int WIDTH = 640;//640;
-	public static final int HEIGHT = 480;//480;
-	public static final int SCALE = 1; //4
+	public static final int SCALE = 2; //4
+	public static final int WIDTH = 640 / SCALE;//640;
+	public static final int HEIGHT = 480 / SCALE;//480;
 
 	private boolean running;
 	private Thread thread;
