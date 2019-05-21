@@ -34,9 +34,9 @@ public class Screen extends Bitmap {
 		//cam.rot = new Vector3(20, 30, -10);
 
 		geometries.add(new Sphere(new Vector3(0, 1, 3), 2, PhysicsMask.REFLECT.getMask() | PhysicsMask.REFRACT.getMask(), 1.33));
-		geometries.add(new Sphere(new Vector3(5, 0, 5), 2, Art.cage, PhysicsMask.REFLECT.getMask(), 1.0, 0));
+		geometries.add(new Sphere(new Vector3(5, 0, 5), 2, Art.cage, 50, 5, PhysicsMask.REFLECT.getMask(), 1.0, 0.5));
 		geometries.add(new Sphere(new Vector3(-1, 1, 12), 3, new Vector3(0, 0, 1)));
-		geometries.add(new Plane(new Vector3(0, -3, 0), new Vector3(0, 1, 0), Art.cage));
+		geometries.add(new Plane(new Vector3(0, -3, 0), new Vector3(0, 1, 0), Art.cage, 5, 1));
 		
 		light.add(new Light(new Vector3(1, 0, 0)));
 	}
@@ -72,6 +72,10 @@ public class Screen extends Bitmap {
 				Ray r = cam.generateRay(x, y);
 				
 				Vector3 color = r.rayColor(geometries, light);
+
+				if (color.x > 1) color.x = 1;
+				if (color.y > 1) color.y = 1;
+				if (color.z > 1) color.z = 1;
 				
 				pixels[x+y*width] = (int) (color.x * 0xff) << 16 | (int) (color.y * 0xff) << 8 | (int) (color.z * 0xff);
 			}

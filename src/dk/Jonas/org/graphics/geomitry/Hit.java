@@ -9,6 +9,8 @@ public class Hit {
 	private Vector3 pos;
 	private Vector3 center;
 	private Vector3 normal;
+	private double damper = 1;
+	private double reflectivity;
 	private double refractionIndex = 1;
 	private double opacity = -1;
 	private int physicsMask;
@@ -36,6 +38,30 @@ public class Hit {
 	public Hit(double t, Vector3 color, Ray ray, Vector3 center, Vector3 normal) {
 		this(t, color, ray, center);
 		this.normal = normal;
+	}
+	
+	public Hit(double t, Vector3 color, Ray ray, Vector3 center, double damper, double reflectivity) {
+		this(t, color, ray, center);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Hit(double t, Vector3 color, Ray ray, Vector3 center, double damper, double reflectivity, double refractionIndex, int physicsMask, double opacity) {
+		this(t, color, ray, center, refractionIndex, physicsMask, opacity);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Hit(double t, Vector3 color, Ray ray, Vector3 center, double damper, double reflectivity, double refractionIndex, int physicsMask, double opacity, Vector3 normal) {
+		this(t, color, ray, center, refractionIndex, physicsMask, opacity, normal);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Hit(double t, Vector3 color, Ray ray, Vector3 center, double damper, double reflectivity, Vector3 normal) {
+		this(t, color, ray, center, normal);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
 	}
 	
 	public double getDistance() {
@@ -68,5 +94,13 @@ public class Hit {
 
 	public int getPhysicsMask() {
 		return physicsMask;
+	}
+
+	public double getDamper() {
+		return damper;
+	}
+
+	public double getReflectivity() {
+		return reflectivity;
 	}
 }

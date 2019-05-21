@@ -8,6 +8,8 @@ public class Sphere extends Geometry {
 	private double radius;
 	private Vector3 color;
 	private Bitmap image;
+	private double damper = 1;
+	private double reflectivity;
 	private double imageColorBlending;
 	private double refractionIndex;
 	private double opacity = -1;
@@ -58,6 +60,48 @@ public class Sphere extends Geometry {
 		this.imageColorBlending = 1;
 	}
 	
+	public Sphere(Vector3 pos, double radius, Vector3 color, double damper, double reflectivity) {
+		this(pos, radius, color);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Sphere(Vector3 pos, double radius, Vector3 color, double damper, double reflectivity, Bitmap image, double imageColorBlending) {
+		this(pos, radius, color, image, imageColorBlending);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Sphere(Vector3 pos, double radius, Bitmap image, double damper, double reflectivity) {
+		this(pos, radius, image);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Sphere(Vector3 pos, double radius, double damper, double reflectivity, int physicsMask, double refractionIndex) {
+		this(pos, radius, physicsMask, refractionIndex);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Sphere(Vector3 pos, double radius, Vector3 color, double damper, double reflectivity, int physicsMask, double refractionIndex, double opacity) {
+		this(pos, radius, color, physicsMask, refractionIndex, opacity);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Sphere(Vector3 pos, double radius, Vector3 color, double damper, double reflectivity, Bitmap image, double imageColorBlending, int physicsMask, double refractionIndex, double opacity) {
+		this(pos, radius, color, image, imageColorBlending, physicsMask, refractionIndex, opacity);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Sphere(Vector3 pos, double radius, Bitmap image, double damper, double reflectivity, int physicsMask, double refractionIndex, double opacity) {
+		this(pos, radius, image, physicsMask, refractionIndex, opacity);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
 	public Hit collides(Ray ray) {
 		double r2 = radius * radius;
 		
@@ -95,6 +139,6 @@ public class Sphere extends Geometry {
 			currColor = currColor.add(image.getPixelVector(tx, ty).mul(imageColorBlending));
 		}
 		
-		return new Hit(t0, currColor, ray, pos, refractionIndex, physicsMask, opacity);
+		return new Hit(t0, currColor, ray, pos, damper, reflectivity, refractionIndex, physicsMask, opacity);
 	}
 }

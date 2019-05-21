@@ -12,6 +12,8 @@ public class Plane extends Geometry {
 	
 	private Vector3 color;
 	private Bitmap image;
+	private double damper = 1;
+	private double reflectivity;
 	private double imageColorBlending;
 	private double refractionIndex;
 	private double opacity = -1;
@@ -63,6 +65,48 @@ public class Plane extends Geometry {
 		this.image = image;
 		this.imageColorBlending = 1;
 	}
+	
+	public Plane(Vector3 pos, Vector3 normal, Vector3 color, double damper, double reflectivity) {
+		this(pos, normal, color);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Plane(Vector3 pos, Vector3 normal, Vector3 color, Bitmap image, double damper, double reflectivity, double imageColorBlending) {
+		this(pos, normal, color, image, imageColorBlending);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Plane(Vector3 pos, Vector3 normal, Bitmap image, double damper, double reflectivity) {
+		this(pos, normal, image);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Plane(Vector3 pos, Vector3 normal, double damper, double reflectivity, int physicsMask, double refractionIndex) {
+		this(pos, normal, physicsMask, refractionIndex);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Plane(Vector3 pos, Vector3 normal, Vector3 color, double damper, double reflectivity, int physicsMask, double refractionIndex, double opacity) {
+		this(pos, normal, color, physicsMask, refractionIndex, opacity);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Plane(Vector3 pos, Vector3 normal, Vector3 color, Bitmap image, double damper, double reflectivity, double imageColorBlending, int physicsMask, double refractionIndex, double opacity) {
+		this(pos, normal, color, image, imageColorBlending, physicsMask, refractionIndex, opacity);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
+	
+	public Plane(Vector3 pos, Vector3 normal, Bitmap image, double damper, double reflectivity, int physicsMask, double refractionIndex, double opacity) {
+		this(pos, normal, image, physicsMask, refractionIndex, opacity);
+		this.damper = damper;
+		this.reflectivity = reflectivity;
+	}
 
 	@Override
 	public Hit collides(Ray ray) {
@@ -85,7 +129,7 @@ public class Plane extends Geometry {
 				currColor = currColor.add(image.getPixelVector(tx, ty).mul(imageColorBlending));
 			}
 			
-			return new Hit(t, currColor, ray, tCoord, refractionIndex, physicsMask, opacity, normal);
+			return new Hit(t, currColor, ray, tCoord, damper, reflectivity, refractionIndex, physicsMask, opacity, normal);
 		}
 		
 		return null;

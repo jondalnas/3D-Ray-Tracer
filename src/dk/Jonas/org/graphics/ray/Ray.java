@@ -54,26 +54,35 @@ public class Ray {
 		if (closest == null) return Screen.SKY_COLOR;
 		
 		color = closest.getColor();
+
+		double brightness = 0;
+		double specular = 0;
+		
+		for (Light l : lights) {
+			Vector3 toLight = l.pos.sub(closest.getPos());
+			double distanceToLight = toLight.length();
+			toLight.mulEqual(1/distanceToLight);
+			
+			Ray toLightRay = new Ray(closest.getPos().add(toLight), toLight);
+			
+			Hit closestToLight;
+			if ((closestToLight = toLightRay.intersects(geometries)) == null || closestToLight.getDistance() > distanceToLight) {
+				double currBrightness = closest.getNormal().dot(toLight);
+				
+				if (currBrightness > brightness) brightness = currBrightness;
+				
+				double currSpecular = reflect(toLight.negative(), closest.getNormal()).dot(dir.negative());
+				
+				if (currSpecular > specular) specular = currSpecular;
+			}
+		}
+		
+		if (specular > 1) specular = 1;
+		
+		specular = Math.pow(specular, closest.getDamper()) * closest.getReflectivity();
 		
 		if (closest.getPhysicsMask() == 0) {
-			double brightness = 0;
-			
-			for (Light l : lights) {
-				Vector3 toLight = l.pos.sub(closest.getPos());
-				double distanceToLight = toLight.length();
-				toLight.mulEqual(1/distanceToLight);
-				
-				Ray toLightRay = new Ray(closest.getPos().add(toLight), toLight);
-				
-				Hit closestToLight;
-				if ((closestToLight = toLightRay.intersects(geometries)) == null || closestToLight.getDistance() > distanceToLight) {
-					double currBrightness = closest.getNormal().dot(toLight);
-					
-					if (currBrightness > brightness) brightness = currBrightness;
-				}
-			}
-			
-			return color.mul(1 - (1 - brightness) * Screen.MIN_BRIGHTNESS);
+			return color.mul(1 - (1 - brightness) * Screen.MIN_BRIGHTNESS).add(new Vector3(1, 1, 1).mul(specular));
 		} else {
 			if (ittr >= Screen.MAX_NUM_OF_ITTERATIONS) return closest.getColor() == null ? Vector3.ZERO : closest.getColor();
 			
@@ -81,7 +90,7 @@ public class Ray {
 			Vector3 currColor = Vector3.ZERO;
 			
 			if (PhysicsMask.REFLECT.testMask(closest.getPhysicsMask())) {
-				Vector3 reflectDir = dir.sub(closest.getNormal().mul(2*(dir.dot(closest.getNormal()))));
+				Vector3 reflectDir = reflect(dir, closest.getNormal());
 				Ray reflection = new Ray(closest.getPos(), reflectDir);
 				reflection.ittr = ittr + 1;
 				currColor = reflection.rayColor(geometries, lights);
@@ -129,7 +138,11 @@ public class Ray {
 				}
 			}
 			
-			return (closest.getOpacity() == -1) ? currColor : currColor.mul(closest.getOpacity()).add(closest.getColor().mul(1-closest.getOpacity()));
+			return (closest.getOpacity() == -1) ? currColor : currColor.mul(closest.getOpacity()).add(closest.getColor().add(new Vector3(1, 1, 1).mul(specular)).mul(1-closest.getOpacity()));
 		}
+	}
+	
+	public Vector3 reflect(Vector3 in, Vector3 normal) {
+		return in.sub(normal.mul(2*(in.dot(normal))));
 	}
 }
